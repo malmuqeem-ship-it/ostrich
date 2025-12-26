@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>صح أم خطأ – طائر النعامة</title>
 
 <style>
-body{
+  body{
     margin:0;
     font-family: Arial, sans-serif;
     direction: rtl;
@@ -15,133 +15,191 @@ body{
     justify-content:center;
     align-items:center;
 
-    /* خلفية طبيعية تشبه الفهد والنمر */
-    background: linear-gradient(
-        rgba(0,0,0,0.55),
-        rgba(0,0,0,0.55)
-    ),
-    url("https://urldefense.com/v3/__https://images.unsplash.com/photo-1500530855697-b586d89ba3ee__;!!AwBn9Rs0C_0EwUAm!bY3y4inegtgqszwq42VyfnEYuFfdXLHQo9o_BBWhoCrXJNPz6TQx8gew7RvP32LSDFellgVnPJY4BLoyJPwizndfdQ$ ");
-    background-size: cover;
-    background-position: center;
-}
+    /* ✅ نفس ستايل خلفية الفهد والنمر (رمادي فاتح ناعم) */
+    background:
+      radial-gradient(1200px 700px at 20% 20%, #f6f8fb 0%, transparent 60%),
+      radial-gradient(900px 600px at 80% 70%, #eef2f6 0%, transparent 55%),
+      linear-gradient(180deg, #f2f4f7 0%, #e9edf2 100%);
+  }
 
-.box{
+  .box{
+    width:min(620px, 92vw);
     background: rgba(255,255,255,0.92);
-    padding:35px;
-    border-radius:18px;
-    max-width:520px;
-    width:90%;
+    padding:32px 26px;
+    border-radius:14px;
     text-align:center;
-    box-shadow:0 8px 20px rgba(0,0,0,0.3);
-}
+    box-shadow:0 10px 22px rgba(0,0,0,.12);
+    border: 1px solid rgba(0,0,0,.06);
+  }
 
-h1{
-    margin-top:0;
+  h1{
+    margin:0 0 10px;
     color:#2f6f4e;
-}
-
-#question{
     font-size:22px;
-    margin:25px 0;
-}
+    font-weight:700;
+  }
 
-button{
+  #progress{
+    color:#6b7280;
+    font-size:14px;
+    margin-bottom:10px;
+  }
+
+  #question{
     font-size:18px;
-    padding:12px 28px;
+    margin:16px 0 18px;
+    color:#111827;
+  }
+
+  .btn{
+    font-size:15px;
+    padding:10px 22px;
     margin:8px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
     cursor:pointer;
-}
+    min-width:110px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  }
+  .true{ background:#43a047; color:#fff; }
+  .false{ background:#d32f2f; color:#fff; }
+  .next{ background:#2f6f4e; color:#fff; display:none; }
 
-.true{ background:#4caf50; color:#fff; }
-.false{ background:#f44336; color:#fff; }
-.next{ background:#2f6f4e; color:#fff; display:none; }
+  #result{
+    font-size:16px;
+    margin-top:12px;
+    font-weight:700;
+    min-height:22px;
+  }
 
-#result{
-    font-size:20px;
-    margin-top:15px;
-    font-weight:bold;
-}
+  /* ✅ النبذة تحت الإجابة */
+  #hint{
+    margin:10px auto 0;
+    padding:10px 12px;
+    max-width:520px;
+    border-radius:10px;
+    background:#f3f6f4;
+    border:1px solid rgba(47,111,78,.18);
+    color:#1f3b2c;
+    font-size:14px;
+    line-height:1.7;
+    display:none;
+  }
 
-#score{
-    margin-top:15px;
-    font-size:18px;
-}
+  #score{
+    margin-top:14px;
+    font-size:16px;
+    color:#111827;
+    font-weight:700;
+  }
 </style>
 </head>
 
 <body>
-
-<div class="box">
+  <div class="box">
     <h1>صح أم خطأ</h1>
+    <div id="progress"></div>
 
     <div id="question"></div>
 
-    <button class="true" onclick="checkAnswer(true)">صح</button>
-    <button class="false" onclick="checkAnswer(false)">خطأ</button>
+    <!-- ترتيب مناسب للعربي: خطأ يسار، صح يمين -->
+    <button class="btn false" onclick="checkAnswer(false)">خطأ</button>
+    <button class="btn true" onclick="checkAnswer(true)">صح</button>
 
     <div id="result"></div>
+    <div id="hint"></div>
 
-    <button class="next" id="nextBtn" onclick="nextQuestion()">السؤال التالي</button>
+    <button class="btn next" id="nextBtn" onclick="nextQuestion()">السؤال التالي</button>
 
     <div id="score"></div>
-</div>
+  </div>
 
 <script>
-const questions = [
-    { q:"يستطيع طائر النعامة الطيران", a:false },
-    { q:"ذكر النعامة أصغر حجمًا من أنثى النعامة", a:false },
-    { q:"بيض النعام أكبر بيوض الطيور", a:true },
-    { q:"ذكر النعامة لونه بني مائل للرمادي", a:false }
-];
+  const questions = [
+    {
+      q: "يستطيع طائر النعامة الطيران",
+      a: false,
+      hint: "النعامة لا تطير، لكنها سريعة جدًا في الجري وتستخدم أرجلها القوية."
+    },
+    {
+      q: "ذكر النعامة أصغر حجمًا من أنثى النعامة",
+      a: false,
+      hint: "غالبًا يكون الذكر أكبر وأثقل من الأنثى."
+    },
+    {
+      q: "بيض النعام أكبر بيوض الطيور",
+      a: true,
+      hint: "بيض النعامة هو الأكبر حجمًا بين جميع الطيور."
+    },
+    {
+      q: "ذكر النعامة لونه بني مائل للرمادي",
+      a: false,
+      hint: "الذكر أسود مع أبيض، والأنثى غالبًا بني/رمادي للتمويه."
+    }
+  ];
 
-let index = 0;
-let score = 0;
-let answered = false;
+  let index = 0;
+  let score = 0;
+  let answered = false;
 
-const qEl = document.getElementById("question");
-const resultEl = document.getElementById("result");
-const nextBtn = document.getElementById("nextBtn");
-const scoreEl = document.getElementById("score");
+  const qEl = document.getElementById("question");
+  const resultEl = document.getElementById("result");
+  const hintEl = document.getElementById("hint");
+  const nextBtn = document.getElementById("nextBtn");
+  const scoreEl = document.getElementById("score");
+  const progressEl = document.getElementById("progress");
 
-function showQuestion(){
+  function showQuestion(){
+    progressEl.textContent = `السؤال ${index + 1} من ${questions.length}`;
     qEl.textContent = questions[index].q;
-    resultEl.textContent = "";
-    nextBtn.style.display = "none";
-    answered = false;
-}
 
-function checkAnswer(choice){
+    resultEl.textContent = "";
+    hintEl.style.display = "none";
+    hintEl.textContent = "";
+
+    nextBtn.style.display = "none";
+    scoreEl.textContent = "";
+    answered = false;
+  }
+
+  function checkAnswer(choice){
     if(answered) return;
     answered = true;
 
-    if(choice === questions[index].a){
-        resultEl.textContent = "إجابة صحيحة ✔";
-        resultEl.style.color = "green";
-        score++;
+    const correct = questions[index].a;
+
+    if(choice === correct){
+      score++;
+      resultEl.textContent = "إجابة صحيحة";
+      resultEl.style.color = "green";
     } else {
-        resultEl.textContent = "إجابة خاطئة ✖";
-        resultEl.style.color = "red";
+      resultEl.textContent = "إجابة خاطئة";
+      resultEl.style.color = "red";
     }
 
-    nextBtn.style.display = "inline-block";
-}
+    // ✅ إظهار النبذة
+    hintEl.textContent = questions[index].hint;
+    hintEl.style.display = "block";
 
-function nextQuestion(){
+    // ✅ لا انتقال ذاتي، فقط زر
+    nextBtn.style.display = "inline-block";
+  }
+
+  function nextQuestion(){
     index++;
     if(index < questions.length){
-        showQuestion();
+      showQuestion();
     } else {
-        qEl.textContent = "انتهت اللعبة";
-        resultEl.textContent = "";
-        nextBtn.style.display = "none";
-        scoreEl.textContent = `درجتك: ${score} / ${questions.length}`;
+      progressEl.textContent = "انتهت اللعبة";
+      qEl.textContent = "شكراً لمشاركتك!";
+      resultEl.textContent = "";
+      hintEl.style.display = "none";
+      nextBtn.style.display = "none";
+      scoreEl.textContent = `درجتك: ${score} / ${questions.length}`;
     }
-}
+  }
 
-showQuestion();
+  showQuestion();
 </script>
-
 </body>
 </html>
