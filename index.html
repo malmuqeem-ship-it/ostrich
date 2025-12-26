@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>صح أم خطأ - طائر النعامة</title>
+
+<style>
+  body{
+    font-family: Arial, sans-serif;
+    background:#eef5f0;
+    text-align:center;
+    direction:rtl;
+    padding:30px;
+  }
+  .box{
+    background:#fff;
+    max-width:560px;
+    margin:auto;
+    padding:28px;
+    border-radius:16px;
+    box-shadow:0 6px 16px rgba(0,0,0,.12);
+  }
+  h1{ color:#2f6f4e; margin:0 0 10px; }
+  #progress{ color:#555; margin:10px 0 18px; font-size:16px; }
+  #question{ font-size:22px; margin:18px 0 22px; }
+  .btn{
+    font-size:18px;
+    padding:12px 28px;
+    margin:8px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .true{ background:#4caf50; color:white; }
+  .false{ background:#f44336; color:white; }
+  #result{
+    margin-top:18px;
+    font-size:20px;
+    font-weight:bold;
+    min-height:28px;
+  }
+  #explain{
+    margin-top:10px;
+    font-size:16px;
+    color:#444;
+    min-height:22px;
+  }
+  #score{
+    margin-top:16px;
+    font-size:18px;
+    color:#222;
+  }
+  #restart{
+    display:none;
+    margin-top:18px;
+    background:#2f6f4e;
+    color:white;
+  }
+</style>
+</head>
+
+<body>
+  <div class="box">
+    <h1>🐦 صح أم خطأ</h1>
+    <div id="progress"></div>
+    <div id="question"></div>
+
+    <button class="btn true" id="btnTrue" onclick="answer(true)">صح</button>
+    <button class="btn false" id="btnFalse" onclick="answer(false)">خطأ</button>
+
+    <div id="result"></div>
+    <div id="explain"></div>
+    <div id="score"></div>
+
+    <button class="btn" id="restart" onclick="restartGame()">إعادة اللعب</button>
+  </div>
+
+<script>
+  const questions = [
+    {
+      text: "يستطيع طائر النعامة الطيران",
+      answer: false,
+      explain: "النعامة لا تطير، لكنها سريعة جدًا في الجري."
+    },
+    {
+      text: "ذكر النعامة أصغر حجمًا من أنثى النعامة",
+      answer: false,
+      explain: "غالبًا الذكر أكبر وأثقل من الأنثى."
+    },
+    {
+      text: "بيض النعام أكبر بيوض الطيور",
+      answer: true,
+      explain: "بيض النعامة هو الأكبر حجمًا بين جميع الطيور."
+    },
+    {
+      text: "ذكر النعامة لونه بني مائل للرمادي",
+      answer: false,
+      explain: "ذكر النعامة لونه أسود مع أبيض، والأنثى بني/رمادي."
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let locked = false;
+
+  const qEl = document.getElementById("question");
+  const progressEl = document.getElementById("progress");
+  const resultEl = document.getElementById("result");
+  const explainEl = document.getElementById("explain");
+  const scoreEl = document.getElementById("score");
+  const btnTrue = document.getElementById("btnTrue");
+  const btnFalse = document.getElementById("btnFalse");
+  const restartBtn = document.getElementById("restart");
+
+  function showQuestion(){
+    locked = false;
+    resultEl.textContent = "";
+    explainEl.textContent = "";
+    scoreEl.textContent = "";
+    progressEl.textContent = `السؤال ${current + 1} من ${questions.length}`;
+    qEl.textContent = questions[current].text;
+    btnTrue.style.display = "inline-block";
+    btnFalse.style.display = "inline-block";
+    restartBtn.style.display = "none";
+  }
+
+  function answer(user){
+    if(locked) return;
+    locked = true;
+
+    const correct = questions[current].answer;
+
+    if(user === correct){
+      score++;
+      resultEl.textContent = "✅ إجابة صحيحة";
+      resultEl.style.color = "green";
+    } else {
+      resultEl.textContent = "❌ إجابة خاطئة";
+      resultEl.style.color = "red";
+    }
+
+    explainEl.textContent = questions[current].explain;
+
+    setTimeout(()=>{
+      current++;
+      if(current < questions.length){
+        showQuestion();
+      } else {
+        endGame();
+      }
+    }, 1200);
+  }
+
+  function endGame(){
+    progressEl.textContent = "انتهت اللعبة 🎉";
+    qEl.textContent = "شكراً لمشاركتك!";
+    btnTrue.style.display = "none";
+    btnFalse.style.display = "none";
+    explainEl.textContent = "";
+    scoreEl.textContent = `درجتك: ${score} / ${questions.length}`;
+    restartBtn.style.display = "inline-block";
+  }
+
+  function restartGame(){
+    current = 0;
+    score = 0;
+    showQuestion();
+  }
+
+  showQuestion();
+</script>
+</body>
+</html>
